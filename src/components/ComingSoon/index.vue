@@ -5,9 +5,9 @@
     <ul>
       <li class="pullDown">{{pullDownMsg}}</li>
       <li v-for="item of comingList" :key="item.id">
-        <div class="pic_show"><img :src="item.img | setWH('128.180')" @tap=handleToDetail></div>
+        <div class="pic_show"><img :src="item.img | setWH('128.180')" @tap="handleToDetail(item.id)"></div>
         <div class="info_list">
-          <h2>{{item.nm}}</h2>
+          <h2 @tap="handleToDetail(item.id)">{{item.nm}}</h2>
           <img src="@/assets/maxs.png" alt="" v-if="item.version.indexOf('v3d') !== -1">
           <p><span class="person">{{item.wish}}</span> 人想看</p>
           <p>主演: {{item.star}}</p>
@@ -30,9 +30,10 @@ export default {
       comingList: [],
       pullDownMsg: '',
       isLoading: true,
-      preCityId: -1
+      preCityId: -1,
     }
   },
+  props: ['movieId'],
   activated() {
     // 状态管理中的this.$store.state.city.id比较长，定义变量cityId为别名
     let cityId = this.$store.state.city.id;
@@ -50,8 +51,9 @@ export default {
     })
   },
   methods: {
-    handleToDetail() {
-      console.log('handleToDetail');
+    handleToDetail(movieId) {
+      // console.log('handleToDetail');
+      this.$router.push('/movie/detail/2/' + movieId);    // 编程式的导航
     },
     handleToScroll(pos) {
       if (pos.y > 30) {

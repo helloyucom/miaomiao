@@ -1,6 +1,6 @@
 <template>
     <div id="main">
-        <Header></Header>
+        <Header title="喵喵影院"></Header>
         <div id="content">
             <div class="cinema_menu">
                 <div class="city_switch">
