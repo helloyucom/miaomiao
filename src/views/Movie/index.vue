@@ -41,7 +41,6 @@
               if(msg === 'ok') {
                 var nm = res.data.data.nm;
                 var id = res.data.data.id;
-                console.log(this.$store.state.city.id, id);   // test
                 if (id == this.$store.state.city.id) {
                   return;
                 }
