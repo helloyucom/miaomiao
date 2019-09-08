@@ -1,20 +1,25 @@
 <template>
     <div class="city_body">
         <div class="city_list">
-            <div class="city_hot">
-                <h2>热门城市</h2>
-                <ul class="clearfix">
-                    <li v-for="item of hotList" :key="item.id">{{item.nm}}</li>
-                </ul>
+          <Loading v-if="isLoading"></Loading>
+          <Scroller v-else ref="city_List">
+            <div>
+              <div class="city_hot">
+                  <h2>热门城市</h2>
+                  <ul class="clearfix">
+                      <li v-for="item of hotList" :key="item.id" @tap="handleToCity(item.nm, item.id)">{{item.nm}}</li>
+                  </ul>
+              </div>
+              <div class="city_sort" ref="city_sort">
+                  <div v-for="item of cityList" :key="item.index">
+                      <h2>{{item.index}}</h2>
+                      <ul>
+                          <li v-for="list of item.list" :key="list.id" @tap="handleToCity(list.nm, list.id)">{{list.nm}}</li>
+                      </ul>
+                  </div>
+              </div>
             </div>
-            <div class="city_sort" ref="city_sort">
-                <div v-for="item of cityList" :key="item.index">
-                    <h2>{{item.index}}</h2>
-                    <ul>
-                        <li v-for="list of item.list" :key="list.id">{{list.nm}}</li>
-                    </ul>
-                </div>
-            </div>
+          </Scroller>
         </div>
         <div class="city_index">
             <ul>
@@ -30,10 +35,19 @@
         data() {
           return {
               cityList: [],
-              hotList: []
+              hotList: [],
+              isLoading: true
           }
         },
         mounted() {
+          let cityList = JSON.parse(localStorage.getItem('cityList'));
+          let hotList = JSON.parse(localStorage.getItem('hotList'));
+
+          if (cityList && hotList){   // 看下本地存储中有没有保存城市列表和热门城市
+              this.cityList = cityList;
+              this.hotList = hotList;
+              this.isLoading = false;
+          } else {                  // 本地存储中没有找到城市列表和热门城市
             this.axios.get('/api/cityList').then((res) => {
                 var msg = res.data.msg;
                 if (msg === 'ok') {
@@ -44,8 +58,12 @@
                     var {cityList, hotList} = this.formatCityList(cities);
                     this.cityList = cityList;
                     this.hotList = hotList;
+                    window.localStorage.setItem('cityList', JSON.stringify(cityList));
+                    window.localStorage.setItem('hotList', JSON.stringify(hotList));
+                    this.isLoading = false;
                 }
-            })
+            });
+          }
         },
         methods: {
             // 把获取到的cities数组数据格式化为：[{index: 'A', list: [{nm: '阿城', id: '123'}]}]
@@ -53,7 +71,7 @@
                 // 准备2个结果集来存放数据
                 var cityList = [];
                 var hotList = [];
-                
+
                 for (var i = 0; i < cities.length; i++) {
                     if (cities[i].isHot === 1) {
                         hotList.push({ id: cities[i].id, nm: cities[i].nm})
@@ -102,7 +120,16 @@
                 // console.log(index);
                 var h2 = this.$refs.city_sort.getElementsByTagName('h2');
                 // 让city_list滚动到对应索引
-                this.$refs.city_sort.parentNode.scrollTop = h2[index].offsetTop;
+                // this.$refs.city_sort.parentNode.scrollTop = h2[index].offsetTop;
+
+                this.$refs.city_List.toScrollTop(-h2[index].offsetTop);
+            },
+            handleToCity(nm, id) {
+              // 改变状态管理
+              this.$store.commit('city/CITY_INFO', {nm, id});
+              window.localStorage.setItem('nowNm', nm);
+              window.localStorage.setItem('nowId', id);
+              this.$router.push('movie/nowPlaying')
             }
         }
     }
