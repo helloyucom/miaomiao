@@ -6,7 +6,7 @@
   <Loading v-if="isLoading"></Loading>
   <div v-else id="content" class="contentDetail">
     <div class="detail_list">
-      <!-- <div class="detail_list_bg"></div> -->
+      <!-- 添加背景图片 -->
       <div class="detail_list_bg" :style="{ 'background-image' : 'url('+ detailMovie.img.replace(/w\.h/,'148.208') +')' }"></div>
       <div class="detail_list_filter"></div>
       <div class="detail_list_content">
